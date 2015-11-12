@@ -70,8 +70,8 @@ class RegistrationDatePlugin extends Plugin
 
 		return sprintf(
 			'<abbr title="%s">%s</abbr>',
-			date_i18n( get_option( 'date_format' ), $timestamp ),
-			sprintf( __( '%s ago', 'registration-date' ), human_time_diff( $timestamp ) )
+			esc_attr( date_i18n( get_option( 'date_format' ), $timestamp ) ),
+			esc_html( sprintf( __( '%s ago', 'registration-date' ), human_time_diff( $timestamp ) ) )
 		);
 	}
 }
