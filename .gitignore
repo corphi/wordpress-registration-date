@@ -1,0 +1,8 @@
+# Local PHPUnit
+phpunit.xml
+phpunit.phar
+
+# Eclipse project files
+.buildpath
+.project
+.settings
