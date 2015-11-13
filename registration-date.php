@@ -3,7 +3,7 @@
 Plugin Name: Registration Date
 Plugin URI: http://github.com/corphi/wordpress-registration-date
 Description: Add the registration date column to the users table. If you don’t have PHP 5.3 or later, your WordPress will explode.
-Version: 0.1
+Version: 0.2
 Author: Philipp Cordes
 Text Domain: registration-date
 Domain Path: /languages/
@@ -19,7 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @see http://geertdedeckere.be/article/loading-wordpress-language-files-the-right-way
  */
-add_action( 'init' , function () {
+function registration_date_load_textdomain()
+{
 	remove_action( 'init', __FUNCTION__ );
 
 	$domain = 'registration-date';
@@ -28,49 +29,69 @@ add_action( 'init' , function () {
 
 	load_textdomain( $domain, WP_LANG_DIR . "/registration-date/$domain-$locale.mo" );
 	load_plugin_textdomain( $domain, false, basename( __DIR__ ) . '/languages/' );
-});
+}
+add_action( 'init' , 'registration_date_load_textdomain' );
 
+
+if ( ! function_exists( 'registration_date_trigger_error' ) ) {
+	/**
+	 * Show an error message.
+	 * 
+	 * @see http://www.squarepenguin.com/wordpress/?p=6 Inspiration
+	 * 
+	 * @param string $message
+	 * @param int    $type    optional
+	 * @return bool
+	 */
+	function registration_date_trigger_error( $message, $level = E_USER_ERROR )
+	{
+		if ( isset( $_GET['action'] ) && 'error_scrape' === $_GET['action'] ) {
+			echo $message;
+			return true;
+		}
+
+		return trigger_error( $message, $level );
+	}
+}
 
 // Check for suitable environment
-if ( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 50400 ) {
-	// If we’re the first user of the library, use the bundled one
-	if ( ! class_exists( 'Shy\WordPress\Plugin' ) ) {
-		pfadfinden_updater_load_textdomain();
-		if ( ! include_once __DIR__ . '/use/shy-wordpress/src/autoloader.php' ) {
-			trigger_pfadfinden_plugin_error(
-				__( 'Couldn’t load required library “shy-wordpress”. Reinstalling the plugin may solve this problem.', 'registration-date' ),
-				E_USER_ERROR
-			);
-			return;
-		}
-	}
+if ( ! defined( 'PHP_VERSION_ID' ) || PHP_VERSION_ID < 50400 ) {
+	// Version too low
+	registration_date_load_textdomain();
+	registration_date_trigger_error(
+		sprintf(
+			__( 'You need at least PHP 5.4 to use Registration Date. Your are using %s.', 'registration-date' ),
+			PHP_VERSION
+		),
+		E_USER_ERROR
+	);
+}
 
-	// Register our autoloader
-	if ( ! include_once __DIR__ . '/src/autoloader.php' ) {
-		pfadfinden_theme_updater_load_textdomain();
-		trigger_pfadfinden_plugin_error(
-			__( 'The plugin is incomplete. Reinstalling it may solve this problem.', 'registration-date' ),
+// Load required library shy-wordpress
+if ( ! function_exists( 'shy_wordpress_autoloader' ) ) {
+	if ( ! include_once __DIR__ . '/use/shy-wordpress/src/autoloader.php' ) {
+		registration_date_load_textdomain();
+		registration_date_trigger_error(
+			__( 'Couldn’t load required library “shy-wordpress”. Reinstalling the plugin may solve this problem.', 'registration-date' ),
 			E_USER_ERROR
 		);
 		return;
 	}
-
-	return new \Corphi\WordPress\RegistrationDatePlugin();
 }
 
-
-// Display error message
-pfadfinden_updater_load_textdomain();
-trigger_pfadfinden_plugin_error(
-	sprintf(
-		__( 'You need at least PHP 5.4 to use Registration Date. Your are using %s.', 'registration-date' ),
-		PHP_VERSION
-	),
-	E_USER_ERROR
-);
-
-if ( false ) {
-	// Dummy calls for translation to include metadata in translation files
-	__( 'Registration Date', 'registration-date' );
-	__( 'Add the registration date column to the users table. If you don’t have PHP 5.3 or later, your WordPress will explode.', 'registration-date' );
+// Register our autoloader
+if ( ! include_once __DIR__ . '/src/autoloader.php' ) {
+	registration_date_load_textdomain();
+	registration_date_trigger_error(
+		__( 'The plugin is incomplete. Reinstalling it may solve this problem.', 'registration-date' ),
+		E_USER_ERROR
+	);
+	return;
 }
+
+return new \Corphi\WordPress\RegistrationDatePlugin();
+
+
+// Dummy calls for translation to include metadata in translation files
+__( 'Registration Date', 'registration-date' );
+__( 'Add the registration date column to the users table. If you don’t have PHP 5.3 or later, your WordPress will explode.', 'registration-date' );
