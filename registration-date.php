@@ -3,7 +3,7 @@
 Plugin Name: Registration Date
 Plugin URI: http://github.com/corphi/wordpress-registration-date
 Description: Add the registration date column to the users table. If you don’t have PHP 5.3 or later, your WordPress will explode.
-Version: 0.2
+Version: 0.3
 Author: Philipp Cordes
 Text Domain: registration-date
 Domain Path: /languages/
