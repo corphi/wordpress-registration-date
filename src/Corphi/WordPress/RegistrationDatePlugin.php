@@ -34,7 +34,7 @@ class RegistrationDatePlugin extends Plugin
 	 */
 	public function filterColumns( array $columns )
 	{
-		$columns['registration_date'] = __( 'Registration date', 'registration-date' );
+		$columns['user_registered'] = __( 'Registration date', 'registration-date' );
 
 		return $columns;
 	}
@@ -47,7 +47,7 @@ class RegistrationDatePlugin extends Plugin
 	 */
 	public function filterSortableColumns( array $sortableColumns )
 	{
-		$sortableColumns['registration_date'] = 'registration_date';
+		$sortableColumns['user_registered'] = 'user_registered';
 
 		return $sortableColumns;
 	}
@@ -62,15 +62,17 @@ class RegistrationDatePlugin extends Plugin
 	 */
 	public function filterColumnOutput( $output, $columnName, $userId )
 	{
-		if ( 'registration_date' !== $columnName ) {
+		if ( 'user_registered' !== $columnName ) {
 			return $output;
 		}
 
 		$timestamp = strtotime( get_userdata( $userId )->user_registered );
 
 		return sprintf(
-			'<abbr title="%s">%s</abbr>',
+			'<time datetime="%s" title="%s, %s">%s</time>',
+			esc_attr( date( \DateTime::RFC3339, $timestamp ) ),
 			esc_attr( date_i18n( get_option( 'date_format' ), $timestamp ) ),
+			esc_attr( date_i18n( get_option( 'time_format' ), $timestamp ) ),
 			esc_html( sprintf( __( '%s ago', 'registration-date' ), human_time_diff( $timestamp ) ) )
 		);
 	}
