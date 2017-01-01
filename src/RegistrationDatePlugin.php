@@ -2,18 +2,29 @@
 
 namespace Corphi\WordPress;
 
-use Shy\WordPress\Plugin;
-
-
-
 /**
  * A small plugin adding the registration date column to the users table.
  * 
  * @author Philipp Cordes <pc@irgendware.net>
  * @license GPL-2.0+
  */
-class RegistrationDatePlugin extends Plugin
+class RegistrationDatePlugin
 {
+	/**
+	 * Shortcut method for registering a method as action or filter.
+	 *
+	 * @param string $actionOrFilter
+	 * @param string $method
+	 * @param int    $priority
+	 * @param int    $acceptedArgs
+	 *
+	 * @return void
+	 */
+	protected function addHookMethod( $actionOrFilter, $method, $priority = 10, $acceptedArgs = 99 )
+	{
+		add_filter( $actionOrFilter, [ $this, $method ], $priority, $acceptedArgs );
+	}
+
 	public function __construct()
 	{
 		foreach ( [
@@ -28,8 +39,9 @@ class RegistrationDatePlugin extends Plugin
 
 	/**
 	 * Add the column.
-	 * 
+	 *
 	 * @param string[] $columns
+	 *
 	 * @return string[]
 	 */
 	public function filterColumns( array $columns )
@@ -41,8 +53,9 @@ class RegistrationDatePlugin extends Plugin
 
 	/**
 	 * Make the column sortable.
-	 * 
+	 *
 	 * @param string[] $sortableColumns
+	 *
 	 * @return string[]
 	 */
 	public function filterSortableColumns( array $sortableColumns )
@@ -54,10 +67,11 @@ class RegistrationDatePlugin extends Plugin
 
 	/**
 	 * Output the date.
-	 * 
+	 *
 	 * @param string $output
 	 * @param string $columnName
 	 * @param int    $userId
+	 *
 	 * @return string
 	 */
 	public function filterColumnOutput( $output, $columnName, $userId )

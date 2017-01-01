@@ -5,7 +5,6 @@
  * Variant of the one from github.com/tierra/wordpress-plugins-tests
  */
 
-require_once __DIR__ . '/../use/shy-wordpress/src/autoloader.php';
 require_once __DIR__ . '/../src/autoloader.php';
 require_once __DIR__ . '/autoloader.php';
 
